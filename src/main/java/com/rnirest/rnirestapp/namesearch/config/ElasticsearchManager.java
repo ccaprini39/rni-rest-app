@@ -7,6 +7,7 @@ import java.util.Map;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.*;
 
+import com.rnirest.rnirestapp.namesearch.model.NamesearchRequest;
 import com.rnirest.rnirestapp.namesearch.model.Person;
 import com.rnirest.rnirestapp.namesearch.model.SearchResult;
 
@@ -187,16 +188,17 @@ public class ElasticsearchManager {
         return result;
     }
 
-    public List<SearchResult> singleQuery(Person personIn) throws Exception{
+    public List<SearchResult> singleQuery(NamesearchRequest nsr) throws Exception{
         SearchRequest searchRequest = new SearchRequest("namesearch");
         List<SearchResult> hitList = new ArrayList<>();
 
-        String name = personIn.getName();
+        String name = nsr.getName();
+        Integer window = nsr.getWindow();
         MatchQueryBuilder query = QueryBuilders.matchQuery("name", name);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(query)
             .explain(Boolean.TRUE)
-            .size(WINDOW);
+            .size(window);
 
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse = null;
@@ -207,11 +209,13 @@ public class ElasticsearchManager {
             String time = String.valueOf(timeLong);
 
             for(SearchHit hit : results) {
+                Float score = hit.getScore();
+                String scoreString = String.valueOf(score);
                 String sourceAsString = hit.getSourceAsString();
                 if (sourceAsString != null){
                     Map<String, Object> fields = hit.getSourceAsMap();
                     SearchResult searchResult = new SearchResult( 
-                        fields.get("name").toString(), fields.get("dob").toString(), time
+                        fields.get("name").toString(), fields.get("dob").toString(), time, scoreString
                     );
                     hitList.add(searchResult);
                 }
@@ -223,16 +227,18 @@ public class ElasticsearchManager {
         }
     }
 
-    public List<SearchResult> singleRniQuery(Person personIn) throws Exception{
+    public List<SearchResult> singleRniQuery(NamesearchRequest nsr) throws Exception{
         SearchRequest searchRequest = new SearchRequest("namesearch");
         List<SearchResult> hitList = new ArrayList<>();
 
-        String name = personIn.getName();
+        String name = nsr.getName();
+        Integer window = nsr.getWindow();
         MatchQueryBuilder query = QueryBuilders.matchQuery("rni_name", name);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(query)
+            //.addRescorer(rescoreBuilder)
             .explain(Boolean.TRUE)
-            .size(WINDOW);
+            .size(window);
 
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse = null;
@@ -243,11 +249,13 @@ public class ElasticsearchManager {
             String time = String.valueOf(timeLong);
 
             for(SearchHit hit : results) {
+                Float score = hit.getScore();
+                String scoreString = String.valueOf(score);
                 String sourceAsString = hit.getSourceAsString();
                 if (sourceAsString != null){
                     Map<String, Object> fields = hit.getSourceAsMap();
                     SearchResult searchResult = new SearchResult( 
-                        fields.get("name").toString(), fields.get("dob").toString(), time
+                        fields.get("name").toString(), fields.get("dob").toString(), time, scoreString
                     );
                     hitList.add(searchResult);
                 }

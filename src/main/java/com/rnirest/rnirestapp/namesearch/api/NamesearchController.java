@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 import com.rnirest.rnirestapp.namesearch.model.ElasticIndex;
+import com.rnirest.rnirestapp.namesearch.model.NamesearchRequest;
 import com.rnirest.rnirestapp.namesearch.model.Person;
 import com.rnirest.rnirestapp.namesearch.model.SearchResult;
 import com.rnirest.rnirestapp.namesearch.config.ElasticsearchManager;
@@ -79,10 +80,10 @@ public class NamesearchController {
     }
 
     @PostMapping(value = "/query-name-single", headers = "Content-Type=application/json")
-    public ResponseEntity<List<SearchResult>> singleNameQuery(@RequestBody Person personInput) {
-        logger.info(personInput.toString());
+    public ResponseEntity<List<SearchResult>> singleNameQuery(@RequestBody NamesearchRequest namesearchRequest) {
+        logger.info(namesearchRequest.toString());
         try {
-            List<SearchResult> results = elasticManager.singleQuery(personInput);
+            List<SearchResult> results = elasticManager.singleQuery(namesearchRequest);
             return new ResponseEntity<List<SearchResult>>(results,HttpStatus.OK);
         } catch (Exception e) {
             //e.printStackTrace();
@@ -91,10 +92,10 @@ public class NamesearchController {
     }
 
     @PostMapping(value = "/query-rni-name-single", headers = "Content-Type=application/json")
-    public ResponseEntity<List<SearchResult>> singleRniNameQuery(@RequestBody Person personInput) {
-        logger.info(personInput.toString());
+    public ResponseEntity<List<SearchResult>> singleRniNameQuery(@RequestBody NamesearchRequest namesearchRequest) {
+        logger.info(namesearchRequest.toString());
         try {
-            List<SearchResult> results = elasticManager.singleRniQuery(personInput);
+            List<SearchResult> results = elasticManager.singleRniQuery(namesearchRequest);
             return new ResponseEntity<List<SearchResult>>(results,HttpStatus.OK);
         } catch (Exception e) {
             //e.printStackTrace();
