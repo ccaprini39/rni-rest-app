@@ -2,11 +2,14 @@ package com.rnirest.rnirestapp.namesearch.config;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.*;
 
+import com.rnirest.rnirestapp.namesearch.model.AdvancedNamesearchRequest;
 import com.rnirest.rnirestapp.namesearch.model.NamesearchRequest;
 import com.rnirest.rnirestapp.namesearch.model.Person;
 import com.rnirest.rnirestapp.namesearch.model.SearchResult;
@@ -28,7 +31,9 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.index.query.AbstractQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -46,7 +51,8 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 public class ElasticsearchManager {
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchManager.class);
     private static ElasticsearchManager instance;
-    private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com";
+    //private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com";
+    private static final String elastic_host = "localhost";
     private static final Integer elastic_port = 9200;
     private static final String index = "namesearch";
     private RestHighLevelClient client;
@@ -90,8 +96,9 @@ public class ElasticsearchManager {
      * @param rescorer
      * @return 
      */
-    public SearchResponse singleRNIQuery(AbstractQueryBuilder query, QueryRescorerBuilder rescorer) {
+    public List<SearchResult> singleAdvancedRniQuery(AbstractQueryBuilder query, QueryRescorerBuilder rescorer, float minScore) throws Exception{
         SearchRequest searchRequest = new SearchRequest(index);
+        List<SearchResult> hitList = new ArrayList<>();
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(query)
             .addRescorer(rescorer)
@@ -99,15 +106,34 @@ public class ElasticsearchManager {
             .size(WINDOW);
         
         searchRequest.source(sourceBuilder);
+        logger.info(sourceBuilder.toString());
         
         SearchResponse searchResponse = null;
         try {
             searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+            SearchHit[] results = searchResponse.getHits().getHits();
+            Long timeLong = searchResponse.getTook().getMillis();
+            String time = String.valueOf(timeLong);
 
-        return searchResponse;
+            for(SearchHit hit : results) {
+                Float score = hit.getScore();
+                String scoreString = String.valueOf(score);
+                String sourceAsString = hit.getSourceAsString();
+                if (sourceAsString != null){
+                    Map<String, Object> fields = hit.getSourceAsMap();
+                    //String indexedName = getNestedObject(fields);
+                    SearchResult searchResult = new SearchResult( 
+                        fields.get("name").toString(), fields.get("dob").toString(), time, scoreString
+                    );
+                    hitList.add(searchResult);
+                }
+            }
+            return hitList;
+        } catch (Exception e) {
+            logger.info("error processing search");
+            e.printStackTrace();
+            throw new Exception("error processing search");
+        }
     }
 
     /**
@@ -193,10 +219,17 @@ public class ElasticsearchManager {
         List<SearchResult> hitList = new ArrayList<>();
 
         String name = nsr.getName();
+        String dob = nsr.getDob();
         Integer window = nsr.getWindow();
-        MatchQueryBuilder query = QueryBuilders.matchQuery("name", name);
+        //MatchQueryBuilder query = QueryBuilders.matchQuery("name", name);
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder
+            .should(QueryBuilders
+                .matchQuery("name", name)
+            )
+            .should(QueryBuilders.matchQuery("dob", dob));
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(query)
+        sourceBuilder.query(boolQueryBuilder)
             .explain(Boolean.TRUE)
             .size(window);
 
@@ -230,12 +263,16 @@ public class ElasticsearchManager {
     public List<SearchResult> singleRniQuery(NamesearchRequest nsr) throws Exception{
         SearchRequest searchRequest = new SearchRequest("namesearch");
         List<SearchResult> hitList = new ArrayList<>();
-
         String name = nsr.getName();
+        String dob = nsr.getDob();
         Integer window = nsr.getWindow();
-        MatchQueryBuilder query = QueryBuilders.matchQuery("rni_name", name);
+        //MatchQueryBuilder query = QueryBuilders.matchQuery("rni_name", name);
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder
+            .should(QueryBuilders.matchQuery("rni_name", name))
+            .should(QueryBuilders.matchQuery("rni_dob", dob));
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(query)
+        sourceBuilder.query(boolQueryBuilder)
             //.addRescorer(rescoreBuilder)
             .explain(Boolean.TRUE)
             .size(window);

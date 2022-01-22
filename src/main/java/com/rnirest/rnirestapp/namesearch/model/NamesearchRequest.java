@@ -5,17 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class NamesearchRequest {
     private final String name;
     private final Integer window;
-
+    private final String dob;
 
     public NamesearchRequest(@JsonProperty("name") String name,
-                        @JsonProperty("dob") Integer window) {
+                        @JsonProperty("window") String window,
+                        @JsonProperty("dob") String dob) {
         this.name = name;
-        this.window = window;
+        this.window = Integer.parseInt(window);
+        this.dob = dob;
     }
 
     @Override
     public String toString() {
-        return "[name=" + name + ", window=" + window;
+        return "[name=" + name + ", window=" + window +"]";
     }
 
     public String getName(){
@@ -24,5 +26,9 @@ public class NamesearchRequest {
 
     public Integer getWindow(){
         return this.window;
+    }
+
+    public String getDob(){
+        return this.dob;
     }
 }

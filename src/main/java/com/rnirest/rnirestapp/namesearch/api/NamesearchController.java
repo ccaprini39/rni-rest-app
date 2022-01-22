@@ -4,6 +4,9 @@ import io.swagger.annotations.Api;
 import net.minidev.json.JSONObject;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.search.rescore.QueryRescorerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +18,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+import com.rnirest.rnirestapp.namesearch.model.AdvancedNamesearchRequest;
 import com.rnirest.rnirestapp.namesearch.model.ElasticIndex;
 import com.rnirest.rnirestapp.namesearch.model.NamesearchRequest;
 import com.rnirest.rnirestapp.namesearch.model.Person;
 import com.rnirest.rnirestapp.namesearch.model.SearchResult;
 import com.rnirest.rnirestapp.namesearch.config.ElasticsearchManager;
+import com.rnirest.rnirestapp.namesearch.config.DataTransform;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -98,7 +103,21 @@ public class NamesearchController {
             List<SearchResult> results = elasticManager.singleRniQuery(namesearchRequest);
             return new ResponseEntity<List<SearchResult>>(results,HttpStatus.OK);
         } catch (Exception e) {
-            //e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "/query-advanced-rni-name-single", headers = "Content-Type=application/json")
+    public ResponseEntity<List<SearchResult>> singleAdvancedRniNameQuery(@RequestBody AdvancedNamesearchRequest ansr) {
+        logger.info(ansr.toString());
+        Integer threshold = ansr.getThreshold();
+        Float thresholdFloat = threshold.floatValue();
+        BoolQueryBuilder queryBuilder = DataTransform.createQuery(ansr);
+        QueryRescorerBuilder rescorerBuilder = DataTransform.createRescorer(ansr);
+        try {
+            List<SearchResult> results = elasticManager.singleAdvancedRniQuery(queryBuilder, rescorerBuilder, thresholdFloat);
+            return new ResponseEntity<List<SearchResult>>(results, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

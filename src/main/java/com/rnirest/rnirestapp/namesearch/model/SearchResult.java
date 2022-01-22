@@ -20,7 +20,7 @@ public class SearchResult {
 
     @Override
     public String toString() {
-        return "[name=" + name + ", dob=" + dob + ", time=" + time;
+        return "[name=" + name + ", dob=" + dob + ", time=" + time + "]";
     }
 
     public String getName(){
