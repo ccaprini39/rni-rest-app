@@ -99,8 +99,9 @@ public class NamesearchController {
     @PostMapping(value = "/query-rni-name-single", headers = "Content-Type=application/json")
     public ResponseEntity<List<SearchResult>> singleRniNameQuery(@RequestBody NamesearchRequest namesearchRequest) {
         logger.info(namesearchRequest.toString());
+        QueryRescorerBuilder simpleRescorer = DataTransform.createSimpleRescorer(namesearchRequest);
         try {
-            List<SearchResult> results = elasticManager.singleRniQuery(namesearchRequest);
+            List<SearchResult> results = elasticManager.singleRniQuery(namesearchRequest, simpleRescorer);
             return new ResponseEntity<List<SearchResult>>(results,HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

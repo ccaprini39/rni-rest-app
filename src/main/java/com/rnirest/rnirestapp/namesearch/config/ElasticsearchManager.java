@@ -51,7 +51,15 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 public class ElasticsearchManager {
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchManager.class);
     private static ElasticsearchManager instance;
-    //private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com";
+    //the original testing url
+    //private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com"; 
+
+    //the url for flat
+    //private static final String elastic_host = "ec2-18-220-93-214.us-east-2.compute.amazonaws.com";
+
+    //the url for nested
+    //private static final String elastic_host = "ec2-18-217-23-131.us-east-2.compute.amazonaws.com";
+
     private static final String elastic_host = "localhost";
     private static final Integer elastic_port = 9200;
     private static final String index = "namesearch";
@@ -260,7 +268,7 @@ public class ElasticsearchManager {
         }
     }
 
-    public List<SearchResult> singleRniQuery(NamesearchRequest nsr) throws Exception{
+    public List<SearchResult> singleRniQuery(NamesearchRequest nsr, QueryRescorerBuilder rescoreBuilder) throws Exception{
         SearchRequest searchRequest = new SearchRequest("namesearch");
         List<SearchResult> hitList = new ArrayList<>();
         String name = nsr.getName();
@@ -273,7 +281,7 @@ public class ElasticsearchManager {
             .should(QueryBuilders.matchQuery("rni_dob", dob));
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(boolQueryBuilder)
-            //.addRescorer(rescoreBuilder)
+            .addRescorer(rescoreBuilder)
             .explain(Boolean.TRUE)
             .size(window);
 
