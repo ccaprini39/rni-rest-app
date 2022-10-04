@@ -52,7 +52,7 @@ public class ElasticsearchManager {
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchManager.class);
     private static ElasticsearchManager instance;
     //the original testing url
-    //private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com"; 
+    private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com"; 
 
     //the url for flat
     //private static final String elastic_host = "ec2-18-220-93-214.us-east-2.compute.amazonaws.com";
@@ -60,7 +60,7 @@ public class ElasticsearchManager {
     //the url for nested
     //private static final String elastic_host = "ec2-18-217-23-131.us-east-2.compute.amazonaws.com";
 
-    private static final String elastic_host = "localhost";
+    //private static final String elastic_host = "localhost";
     private static final Integer elastic_port = 9200;
     private static final String index = "namesearch";
     private RestHighLevelClient client;
