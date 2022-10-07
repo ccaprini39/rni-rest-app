@@ -52,10 +52,10 @@ public class ElasticsearchManager {
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchManager.class);
     private static ElasticsearchManager instance;
     //the original testing url
-    private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com"; 
+    //private static final String elastic_host = "ec2-18-222-127-24.us-east-2.compute.amazonaws.com"; 
 
     //the url for flat
-    //private static final String elastic_host = "ec2-18-220-93-214.us-east-2.compute.amazonaws.com";
+    private static final String elastic_host = "ec2-18-220-93-214.us-east-2.compute.amazonaws.com";
 
     //the url for nested
     //private static final String elastic_host = "ec2-18-217-23-131.us-east-2.compute.amazonaws.com";
@@ -181,9 +181,7 @@ public class ElasticsearchManager {
         logger.info("Creating IndexRequest");
         return new IndexRequest("namesearch")
             .source( "name", person.getName(),
-                "rni_name", person.getName(),
-                "dob", person.getDob(),
-                "rni_dob", person.getDob());
+                "dob", person.getDob());
     }
     
     /**
@@ -277,8 +275,8 @@ public class ElasticsearchManager {
         //MatchQueryBuilder query = QueryBuilders.matchQuery("rni_name", name);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder
-            .should(QueryBuilders.matchQuery("rni_name", name))
-            .should(QueryBuilders.matchQuery("rni_dob", dob));
+            .should(QueryBuilders.matchQuery("name", name))
+            .should(QueryBuilders.matchQuery("dob", dob));
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(boolQueryBuilder)
             .addRescorer(rescoreBuilder)

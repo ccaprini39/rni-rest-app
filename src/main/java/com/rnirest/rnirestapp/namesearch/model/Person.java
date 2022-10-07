@@ -19,7 +19,7 @@ public class Person {
 
 	private Person() {}
 
-	public Person(String name, String rni_name, String dob, String rni_dob) {
+	public Person(String name, String dob ) {
 		this.name = name;
         this.dob = dob;
 	}

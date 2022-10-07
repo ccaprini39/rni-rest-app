@@ -38,8 +38,8 @@ public class DataTransform {
         DateSpec d = DateSpecBuilder.dateFromString(dob);
 
         DocScoreFunctionBuilder docScoreBuilder1 = new DocScoreFunctionBuilder()
-                .queryField("rni_name", name, nameWeightDouble)
-                .queryField("rni_dob", dob, dobWeightDouble);
+                .queryField("name", name, nameWeightDouble)
+                .queryField("dob", dob, dobWeightDouble);
 
         FunctionScoreQueryBuilder functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
                     //DocScoreFunctionBuilder docScoreBuilder1 = new DocScoreFunctionBuilder()
@@ -70,8 +70,8 @@ public class DataTransform {
         DateSpec d = DateSpecBuilder.dateFromString(dob);
 
         DocScoreFunctionBuilder docScoreBuilder1 = new DocScoreFunctionBuilder()
-                .queryField("rni_name", name, nameWeightDouble)
-                .queryField("rni_dob", dob, dobWeightDouble);
+                .queryField("name", name, nameWeightDouble)
+                .queryField("dob", dob, dobWeightDouble);
 
         FunctionScoreQueryBuilder functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
                     //DocScoreFunctionBuilder docScoreBuilder1 = new DocScoreFunctionBuilder()
@@ -94,8 +94,8 @@ public class DataTransform {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder    
-            .should(QueryBuilders.matchQuery("rni_name", name))
-            .should(QueryBuilders.matchQuery("rni_dob", dob));
+            .should(QueryBuilders.matchQuery("name", name))
+            .should(QueryBuilders.matchQuery("dob", dob));
 
         return boolQueryBuilder;
     }

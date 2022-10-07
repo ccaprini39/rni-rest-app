@@ -18,8 +18,8 @@ public class CustomDocScoreBuilder {
         dobObjectInternal.put("query_value", name);
         dobObjectInternal.put("weight", nameWeight);
 
-        fieldsObject.put("rni_name", nameObjectInternal);
-        fieldsObject.put("rni_dob", dobObjectInternal);
+        fieldsObject.put("name", nameObjectInternal);
+        fieldsObject.put("dob", dobObjectInternal);
 
         object.put("fields", fieldsObject);
         this.jsonObject = object;
