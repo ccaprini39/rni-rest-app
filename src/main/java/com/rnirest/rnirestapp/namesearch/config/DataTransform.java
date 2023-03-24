@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class DataTransform {
     private static final Logger logger = LoggerFactory.getLogger(DataTransform.class);
-    private static String RNI_ROOT = "C:/Users/Collin/Desktop/elasticsearch/elasticsearch-7.13.2/plugins/rni/bt_root";
+    private static String RNI_ROOT = "/home/ec2-user/bt_root";
 
     public static QueryRescorerBuilder createSimpleRescorer( NamesearchRequest nsr) {
         String name = nsr.getName();
