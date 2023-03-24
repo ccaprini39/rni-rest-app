@@ -53,6 +53,7 @@ public class NamesearchController {
     @PostMapping(value = "/createIndex", headers = "Content-Type=application/json")
     public ResponseEntity<Boolean> createNewIndex(@RequestBody ElasticIndex elasticIndexInput) {
         String indexName = elasticIndexInput.getName();
+        System.out.println(indexName);
         try {
             elasticManager.createIndex(indexName);
             System.out.println("Index " + indexName + " created");
