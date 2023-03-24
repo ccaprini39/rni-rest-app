@@ -109,6 +109,7 @@ public class NamesearchController {
             List<SearchResult> results = elasticManager.singleRniQuery(namesearchRequest, simpleRescorer);
             return new ResponseEntity<List<SearchResult>>(results,HttpStatus.OK);
         } catch (Exception e) {
+            logger.info(e.toString());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
