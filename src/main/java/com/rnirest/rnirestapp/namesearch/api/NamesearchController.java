@@ -46,7 +46,7 @@ public class NamesearchController {
     public ResponseEntity<Object> hello() {
         JSONObject object = new JSONObject();
         object.put("message", "hello world!!");
-        system.out.println("hello world");
+        System.out.println("hello world");
         return new ResponseEntity<Object>(object, org.springframework.http.HttpStatus.OK);
     }
 
