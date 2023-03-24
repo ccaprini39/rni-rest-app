@@ -55,7 +55,7 @@ public class NamesearchController {
         String indexName = elasticIndexInput.getName();
         try {
             elasticManager.createIndex(indexName);
-            logger.info("Index " + indexName + " created");
+            System.out.println("Index " + indexName + " created");
             return new ResponseEntity<Boolean>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<Boolean>(HttpStatus.BAD_REQUEST);
@@ -68,6 +68,7 @@ public class NamesearchController {
         String indexName = elasticIndexInput.getName();
         try {
             final boolean result = elasticManager.checkIndex(indexName);
+            System.out.println(result);
             logger.info(indexName + " exists: " + result);
             return new ResponseEntity<Boolean>(result, HttpStatus.OK);
         } catch (Exception e) {
